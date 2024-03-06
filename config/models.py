@@ -23,8 +23,6 @@ class Product(models.Model):
     photo = models.ImageField(upload_to='config/', **NULLABLE, verbose_name='Превью')
     created_at = models.DateField(**NULLABLE, verbose_name='Дата создания')
     updated_at = models.DateField(**NULLABLE, verbose_name='Дата последнего изменения')
-    manufactured_at = models.DateField(**NULLABLE, verbose_name='Дата производства продукта')
-    manufactured_at = models.DateField(**NULLABLE, verbose_name='Дата производства продукта')
 
     def __str__(self):
         return f'{self.name} ({self.category})'

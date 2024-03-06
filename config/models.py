@@ -4,7 +4,7 @@ NULLABLE = {'blank': True, 'null': True}
 
 
 class Category(models.Model):
-    category_id = models.CharField(max_length=100, verbose_name='Номер категории')
+    id = models.CharField(primary_key=True, max_length=100, verbose_name='Номер категории')
     name = models.CharField(max_length=100, verbose_name='Наименование')
     description = models.TextField(**NULLABLE, verbose_name='Описание')
 
@@ -17,7 +17,6 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    product_id = models.CharField(primary_key=True, max_length=100, verbose_name='Номер продукта')
     name = models.CharField(max_length=250, verbose_name='Кличка')
     price = models.TextField(**NULLABLE, verbose_name='Цена')
     # category = models.CharField(max_length=100, verbose_name='Порода')

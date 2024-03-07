@@ -17,7 +17,7 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=250, verbose_name='Кличка')
+    name = models.CharField(max_length=250, verbose_name='Название продукта')
     price = models.TextField(**NULLABLE, verbose_name='Цена')
     # category = models.CharField(max_length=100, verbose_name='Порода')
     description = models.TextField(**NULLABLE, verbose_name='Описание')

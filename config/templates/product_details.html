@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load image_tags %}
 <html>
 <head>
     <title>{{ product.name }}</title>
@@ -9,7 +10,7 @@
     <p>Описание: {{ product.description }}</p>
     <p>Категория: {{ product.category }}</p>
     {% if product.photo %}
-        <img src="{{ product.photo.url }}" alt="Превью продукта">
+        <img src="{{ product.photo|media_url }}" alt="Превью продукта">
     {% endif %}
     <p>Дата создания: {{ product.created_at }}</p>
     <p>Дата последнего изменения: {{ product.updated_at }}</p>

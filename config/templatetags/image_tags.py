@@ -8,5 +8,3 @@ def media_url(image_path):
     if image_path:
         return f'/media/{image_path}'
     return '#'
-
-

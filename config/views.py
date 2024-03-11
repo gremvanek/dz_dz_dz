@@ -1,10 +1,13 @@
+from django.db.models import Model
 from django.shortcuts import render, get_object_or_404
 
 from config.models import Product
 
 
 def home(request):
-    return render(request, 'home.html')
+    products = Product.objects.all()
+    context = {'object_list': products}
+    return render(request, 'home.html', context)
 
 
 def contacts(request):
@@ -22,4 +25,4 @@ def product_detail(request, pk):
     # Используем get_object_or_404 для загрузки продукта по PK или возвращения 404 ошибки, если продукт не найден
     product = get_object_or_404(Product, pk=pk)
     context = {'product': product}
-    return render(request, 'config/templates/product_details.html', context)
+    return render(request, 'product_details.html', context)

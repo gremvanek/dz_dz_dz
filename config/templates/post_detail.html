@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title">{{ post.title }}</h2>
+        <p class="card-text">{{ post.content }}</p>
+        <p class="card-text"><small class="text-muted">Дата создания: {{ post.created_at }}</small></p>
+        <p class="card-text"><small class="text-muted">Признак публикации: {% if post.is_published %}Опубликовано{% else %}Не опубликовано{% endif %}</small></p>
+        <p class="card-text"><small class="text-muted">Количество просмотров: {{ post.views }}</small></p>
+    </div>
+</div>
+{% endblock %}

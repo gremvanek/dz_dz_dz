@@ -28,8 +28,8 @@ class ContactView(TemplateView):
         )
         return render(request, self.template_name)
 
-    def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
+    # def get(self, request, *args, **kwargs):
+    #     return render(request, self.template_name)
 
 
 class PostView(TemplateView):
@@ -51,13 +51,13 @@ class PostView(TemplateView):
 class PostListView(ListView):
     model = Post
     template_name = 'post_list.html'
-    context_object_name = 'posts'
+    # context_object_name = 'posts' - из-за этой строки падал post_list с ошибкой - 'Post' object is not iterable
 
     def get_queryset(self):
         queryset = super().get_queryset()
         published_posts = queryset.filter(is_published=True)
-        unpublished_posts = queryset.filter(is_published=False)
-        return published_posts, unpublished_posts
+        # unpublished_posts = queryset.filter(is_published=False)
+        return published_posts
 
 
 class PostDetailView(DetailView):

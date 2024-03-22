@@ -46,7 +46,7 @@ class Post(models.Model):
     title = models.CharField(max_length=200, verbose_name='Заголовок')
     slug = models.CharField(max_length=200, unique=True, verbose_name='Slug')
     content = models.TextField(verbose_name='Содержимое')
-    preview = models.ImageField(upload_to='posts/%Y/%m/%d/', verbose_name='Превью', blank=True)
+    preview = models.ImageField(upload_to='posts/%Y/%m/%d/', verbose_name='Превью', blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now, verbose_name='Дата создания')
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
     views = models.IntegerField(default=0, verbose_name='Количество просмотров')

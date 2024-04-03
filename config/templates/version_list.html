@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Список версий продукта</h1>
+    <ul>
+        {% for version in versions %}
+        <li>{{ version.version_number }} - {{ version.version_name }}
+            <form method="post" action="{% url 'version_delete' version.pk %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'version_create' %}" class="btn btn-primary">Добавить версию</a>
+</div>
+{% endblock %}

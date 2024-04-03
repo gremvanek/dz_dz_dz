@@ -196,11 +196,13 @@ class VersionDetailView(DetailView):
 
 class VersionCreateView(CreateView):
     model = Version
-    fields = ['version_number', 'version_name', 'is_current']
+    fields = ['product', 'version_number', 'version_name', 'is_current']
+    template_name = 'version_form.html'
     success_url = reverse_lazy('version_list')
 
-    def get_success_url(self):
-        return reverse_lazy('version_list')
+    def form_valid(self, form):
+        form.instance.product_id = self.kwargs['product_id']
+        return super().form_valid(form)
 
 
 class VersionUpdateView(UpdateView):
@@ -214,7 +216,7 @@ class VersionUpdateView(UpdateView):
 
 class VersionDeleteView(DeleteView):
     model = Version
-    template_name = 'version_confirm_delete.html'
+    success_url = reverse_lazy('version_list')
 
     def get_success_url(self):
         return reverse_lazy('version_list')

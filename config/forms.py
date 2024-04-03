@@ -35,7 +35,7 @@ class ProductForm(forms.ModelForm):
 class VersionForm(forms.ModelForm):
     class Meta:
         model = Version
-        fields = ['version_number', 'version_name', 'is_current']
+        fields = ['product', 'version_number', 'version_name', 'is_current']
         labels = {
             'version_number': 'Номер версии',
             'version_name': 'Название версии',

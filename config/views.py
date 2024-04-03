@@ -1,8 +1,8 @@
 import random
 import string
 
-from django.shortcuts import render, get_object_or_404
-from django.urls import reverse_lazy
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView
 from django.views.generic import TemplateView, DetailView, CreateView, UpdateView, DeleteView
 
@@ -45,8 +45,7 @@ class PostView(TemplateView):
 class PostListView(ListView):
     model = Post
     template_name = 'post_list.html'
-
-    # context_object_name = 'object_list'  # Изменил context_object_name на 'object_list', чтобы избежать конфликта имен
+    context_object_name = 'object_list'  # Изменил context_object_name на 'object_list', чтобы избежать конфликта имен
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -142,9 +141,7 @@ class ProductDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        product = context['object']
-        active_version = product.version_set.filter(is_current=True).first()
-        product.active_version = active_version
+        context['product_pk'] = self.kwargs.get('pk')
         return context
 
 
@@ -176,8 +173,10 @@ class VersionListView(ListView):
     template_name = 'version_list.html'
     context_object_name = 'versions'
 
+    def get_success_url(self):
+        return reverse_lazy('versions_list')
     def get_queryset(self):
-        product_id = self.kwargs.get('product_id')
+        product_id = self.kwargs.get('product_pk')
         if product_id:
             product = get_object_or_404(Product, pk=product_id)
             return Version.objects.filter(product=product)
@@ -191,18 +190,26 @@ class VersionDetailView(DetailView):
     context_object_name = 'version'
 
     def get_success_url(self):
-        return reverse_lazy('version_list')
+        return reverse_lazy('versions_list')
 
 
 class VersionCreateView(CreateView):
     model = Version
-    fields = ['product', 'version_number', 'version_name', 'is_current']
+    fields = ['version_number', 'version_name', 'product']
     template_name = 'version_form.html'
-    success_url = reverse_lazy('version_list')
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
     def form_valid(self, form):
-        form.instance.product_id = self.kwargs['product_id']
-        return super().form_valid(form)
+        version = form.save(commit=False)
+        version.product_id = self.kwargs['pk']
+        version.save()
+        return redirect('product_detail', pk=self.kwargs['pk'])
 
 
 class VersionUpdateView(UpdateView):
@@ -211,12 +218,12 @@ class VersionUpdateView(UpdateView):
     template_name = 'version_form.html'
 
     def get_success_url(self):
-        return reverse_lazy('version_list')
+        return reverse_lazy('versions_list')
 
 
 class VersionDeleteView(DeleteView):
     model = Version
-    success_url = reverse_lazy('version_list')
+    success_url = reverse_lazy('versions_list')
 
     def get_success_url(self):
-        return reverse_lazy('version_list')
+        return reverse_lazy('versions_list')

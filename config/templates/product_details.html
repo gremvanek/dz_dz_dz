@@ -19,6 +19,6 @@
     </h4>
     <a href="{% url 'product_update' product.pk %}" class="btn btn-primary">Редактировать</a>
     <a href="{% url 'product_delete' product.pk %}" class="btn btn-danger">Удалить</a>
-    <a href="{% url 'product_versions_list' product_id=product.pk %}" class="btn btn-primary">Версия</a>
+    <a href="{% url 'version_create' pk=product.pk %}" class="btn btn-info ">Создать версию</a>
 </div>
 {% endblock %}

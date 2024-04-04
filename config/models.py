@@ -19,6 +19,7 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=250, verbose_name='Название продукта')
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Цена')
     description = models.TextField(null=True, blank=True, verbose_name='Описание')

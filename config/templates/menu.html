@@ -4,4 +4,5 @@
 <a class="p-2 btn btn-outline-primary" href="{% url 'create_view' %}">Добавить запись</a>
 <a class="p-2 btn btn-outline-primary" href="{% url 'product_create' %}">Добавить товар</a>
 <a class="p-2 btn btn-outline-primary" href="{% url 'post_list' %}">Просмотр записей</a>
-<a class="p-2 btn btn-outline-primary" href="{% url 'versions_list' product_pk=product.pk %}">Версии продуктов</a>
+<a class="p-2 btn btn-outline-primary" href="{% url 'version_create' pk=product_pk %}">Создать новую версию</a>
+

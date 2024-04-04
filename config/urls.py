@@ -9,6 +9,7 @@ from config.views import ContactView, PostCreateView, PostDetailView, PostUpdate
 urlpatterns = [
                   path('post_list/', PostListView.as_view(), name='post_list'),
                   path('contacts/', ContactView.as_view(), name='contacts'),
+                  path('versions/<int:pk>/', VersionListView.as_view(), name='versions'),
                   path('<slug:slug>/', PostDetailView.as_view(), name='post_detail'),
                   path('post_list/create/', PostCreateView.as_view(), name='create_view'),
                   path('<slug:slug>/update/', PostUpdateView.as_view(), name='post_update'),
@@ -18,7 +19,6 @@ urlpatterns = [
                   path('product/create/', ProductCreateView.as_view(), name='product_create'),
                   path('product/<int:pk>/update/', ProductUpdateView.as_view(), name='product_update'),
                   path('product/<int:pk>/delete/', ProductDeleteView.as_view(), name='product_delete'),
-                  path('product/<int:product_pk>/versions/', VersionListView.as_view(), name='versions_list'),
                   path('version/<int:pk>/', VersionDetailView.as_view(), name='version_detail'),
                   path('version/<int:pk>/new/', VersionCreateView.as_view(), name='version_create'),
                   path('version/<int:pk>/edit/', VersionUpdateView.as_view(), name='version_update'),

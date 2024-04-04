@@ -5,15 +5,15 @@
     <h1>Список версий продукта</h1>
     <ul>
         {% for version in versions %}
-        <li>{{ product.name }} - <a href="{% url 'product_detail' pk=product.pk %}">Детали</a></li>
+        <li>{{ version.product.name }} - <a href="{% url 'product_detail' pk=version.product.pk %}">Детали</a></li>
         <li>{{ version.version_number }} - {{ version.version_name }}
-            <form method="post" action="{% url 'version_delete' version.pk %}" style="display: inline;">
+            <form method="post" action="{% url 'version_delete' pk=version.pk %}" style="display: inline;">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
             </form>
         </li>
         {% endfor %}
     </ul>
-    <a href="{% url 'version_create' pk=product_pk %}">Создать новую версию</a>
+    <a href="{% url 'version_create' pk=self.kwargs.get('product_pk') %}">Создать новую версию</a>
 </div>
 {% endblock %}

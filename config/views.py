@@ -2,7 +2,7 @@ import random
 import string
 
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy
 from django.views.generic import ListView
 from django.views.generic import TemplateView, DetailView, CreateView, UpdateView, DeleteView
 
@@ -132,7 +132,7 @@ class ProductListView(ListView):
 class ProductDetailView(DetailView):
     model = Product
     template_name = 'product_details.html'
-
+    context_object_name = 'product'
     def get_object(self, queryset=None):
         obj = super().get_object(queryset=queryset)
         obj.views += 1
@@ -174,7 +174,7 @@ class VersionListView(ListView):
     context_object_name = 'versions'
 
     def get_success_url(self):
-        return reverse_lazy('versions_list')
+        return reverse_lazy('product_list')
     def get_queryset(self):
         product_id = self.kwargs.get('product_pk')
         if product_id:

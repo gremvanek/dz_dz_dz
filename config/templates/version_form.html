@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container">
     <h1>Создать/Редактировать версию</h1>
-    <form method="post" action="{% url 'version_create' pk=product.pk %}">
+    <form method="post" action="{% url 'version_create' product.pk %}">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Сохранить</button>

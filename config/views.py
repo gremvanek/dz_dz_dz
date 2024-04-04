@@ -1,7 +1,7 @@
 import random
 import string
 
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView
 from django.views.generic import TemplateView, DetailView, CreateView, UpdateView, DeleteView
@@ -122,10 +122,7 @@ class ProductListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        products = context['products']
-        for product in products:
-            active_version = product.version_set.filter(is_current=True).first()
-            product.active_version = active_version
+        context['product_id'] = self.kwargs.get('pk')
         return context
 
 
@@ -133,6 +130,7 @@ class ProductDetailView(DetailView):
     model = Product
     template_name = 'product_details.html'
     context_object_name = 'product'
+
     def get_object(self, queryset=None):
         obj = super().get_object(queryset=queryset)
         obj.views += 1
@@ -141,7 +139,7 @@ class ProductDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['product_pk'] = self.kwargs.get('pk')
+        context['product_id'] = self.kwargs.get('pk')
         return context
 
 
@@ -172,45 +170,55 @@ class VersionListView(ListView):
     model = Version
     template_name = 'version_list.html'
     context_object_name = 'versions'
+    success_url = reverse_lazy('post_list')
 
-    def get_success_url(self):
-        return reverse_lazy('product_list')
-    def get_queryset(self):
-        product_id = self.kwargs.get('product_pk')
-        if product_id:
-            product = get_object_or_404(Product, pk=product_id)
-            return Version.objects.filter(product=product)
-        else:
-            return Version.objects.all()
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+
+        # Вызываем метод родительского класса, чтобы сохранить данные формы и получить объект instance
+        response = super().form_valid(form)
+
+        # Генерируем случайный slug
+        random_slug = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+        counter = 1
+        new_slug = random_slug
+        while Post.objects.filter(slug=new_slug).exists():
+            new_slug = f"{random_slug}-{counter}"
+            counter += 1
+
+        # Сохраняем slug в экземпляре объекта Post
+        instance.slug = new_slug
+        instance.save()
 
 
 class VersionDetailView(DetailView):
     model = Version
     template_name = 'version_detail.html'
-    context_object_name = 'version'
-
-    def get_success_url(self):
-        return reverse_lazy('versions_list')
+    context_object_name = 'versions'
 
 
 class VersionCreateView(CreateView):
     model = Version
     fields = ['version_number', 'version_name', 'product']
     template_name = 'version_form.html'
+    context_object_name = 'version_create'
+    success_url = reverse_lazy('versions')
 
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
+    def dispatch(self, request, *args, **kwargs):
+        # Ensure the associated product exists
+        self.product = get_object_or_404(Product, pk=self.kwargs.get('pk'))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['product_pk'] = self.product.pk  # Pass the product's pk to the template
+        return context
 
     def form_valid(self, form):
         version = form.save(commit=False)
-        version.product_id = self.kwargs['pk']
+        version.product = self.product
         version.save()
-        return redirect('product_detail', pk=self.kwargs['pk'])
-
+        return super().form_valid(form)
 
 class VersionUpdateView(UpdateView):
     model = Version

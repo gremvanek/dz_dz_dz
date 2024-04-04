@@ -14,6 +14,6 @@
         </li>
         {% endfor %}
     </ul>
-    <a href="{% url 'version_create' pk=self.kwargs.get('product_pk') %}">Создать новую версию</a>
+    <a href="{% url 'version_create' product.pk %}">Создать новую версию</a>
 </div>
 {% endblock %}

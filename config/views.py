@@ -205,13 +205,12 @@ class VersionCreateView(CreateView):
     success_url = reverse_lazy('versions')
 
     def dispatch(self, request, *args, **kwargs):
-        # Ensure the associated product exists
         self.product = get_object_or_404(Product, pk=self.kwargs.get('pk'))
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['product_pk'] = self.product.pk  # Pass the product's pk to the template
+        context['product_pk'] = self.product.pk
         return context
 
     def form_valid(self, form):

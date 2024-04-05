@@ -9,7 +9,7 @@ from config.views import ContactView, PostCreateView, PostDetailView, PostUpdate
 urlpatterns = [
                   path('post_list/', PostListView.as_view(), name='post_list'),
                   path('contacts/', ContactView.as_view(), name='contacts'),
-                  path('versions/<int:pk>/', VersionListView.as_view(), name='versions'),
+                  path('versions/', VersionListView.as_view(), name='version_list'),
                   path('<slug:slug>/', PostDetailView.as_view(), name='post_detail'),
                   path('post_list/create/', PostCreateView.as_view(), name='create_view'),
                   path('<slug:slug>/update/', PostUpdateView.as_view(), name='post_update'),
@@ -20,7 +20,7 @@ urlpatterns = [
                   path('product/<int:pk>/update/', ProductUpdateView.as_view(), name='product_update'),
                   path('product/<int:pk>/delete/', ProductDeleteView.as_view(), name='product_delete'),
                   path('version/<int:pk>/', VersionDetailView.as_view(), name='version_detail'),
-                  path('version/<int:pk>/new/', VersionCreateView.as_view(), name='version_create'),
+                  path('product/<int:product_id>/version/create/', VersionCreateView.as_view(), name='version_create'),
                   path('version/<int:pk>/edit/', VersionUpdateView.as_view(), name='version_update'),
                   path('version/<int:pk>/delete/', VersionDeleteView.as_view(), name='version_delete'),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

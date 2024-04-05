@@ -53,8 +53,6 @@ class VersionForm(forms.ModelForm):
             'is_current': 'Текущая версия'
         }
 
-    # Задание стиля через инициализацию
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['version_number'].widget.attrs.update({'class': 'form-control'})

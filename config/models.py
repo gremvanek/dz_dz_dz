@@ -19,7 +19,6 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=250, verbose_name='Название продукта')
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Цена')
     description = models.TextField(null=True, blank=True, verbose_name='Описание')
@@ -77,3 +76,7 @@ class Version(models.Model):
     class Meta:
         verbose_name = 'Версия'
         verbose_name_plural = 'Версии'
+
+    @staticmethod
+    def get_absolute_url():
+        return reverse('version_list')

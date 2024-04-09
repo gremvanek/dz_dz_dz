@@ -22,8 +22,8 @@ class ContactView(TemplateView):
         )
         return render(request, self.template_name)
 
-    # def get(self, request, *args, **kwargs):
-    #     return render(request, self.template_name)
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
 
 
 class PostView(TemplateView):
@@ -55,7 +55,7 @@ class PostListView(ListView):
 
 class PostDetailView(DetailView):
     model = Post
-    template_name = 'post_detail.html'
+    template_name = 'post_details.html'
     context_object_name = 'post'
 
     def get_object(self, queryset=None):

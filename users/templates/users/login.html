@@ -9,6 +9,7 @@
         {{ form.as_p }}
         <input type="hidden" name="pk" value="{{ pk }}">
         <button type="submit" class="btn btn-success">Войти</button>
+        <a class="btn btn-danger" href="{% url 'users:password_reset' %}">Сброс пароля</a>
     </form>
 </div>
 {% endblock %}

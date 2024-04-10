@@ -8,16 +8,21 @@
     <img src="{{ product.photo|image_tags }}" alt="{{ product.name }}" class="img-fluid">
     <p>{{ product.description }}</p>
     <p>Цена: {{ product.price }}</p>
-    <p>Категория: {{ product.category }}</p>
-    <p>Количество просмотров: {{ product.views }}</p>
-    <h4 class="my-4 font-weight-normal">{% if product.active_version %}
-        <a>Текущая версия: {{ product.active_version.version_number }} ({{
-            product.active_version.version_name }})</a>
+    <p>Версия: {% if active_version %}
+        <a>Текущая версия: {{ active_version.version_number }} ({{ active_version.version_name }})</a>
         {% else %}
         <a>Нет активной версии</a>
-        {% endif %}
-    </h4>
-    <a href="{% url 'product_update' product_id %}" class="btn btn-primary">Редактировать</a>
-    <a href="{% url 'product_delete' product_id %}" class="btn btn-danger">Удалить</a>
+        {% endif %}</p>
+    <p>Категория: {{ product.category }}</p>
+    <p>Количество просмотров: {{ product.views }}</p>
+<!--    <h4 class="my-4 font-weight-normal">{% if active_version %}-->
+<!--        <a>Текущая версия: {{ active_version.version_number }} ({{ active_version.version_name }})</a>-->
+<!--        {% else %}-->
+<!--        <a>Нет активной версии</a>-->
+<!--        {% endif %}-->
+<!--    </h4>-->
+    <a href="{% url 'product_update' pk=product.pk %}" class="btn btn-primary">Редактировать</a>
+    <a href="{% url 'product_delete' pk=product.pk %}" class="btn btn-danger">Удалить</a>
 </div>
+<div class="pt-4 my-md-5 pt-md-5 border-top">{% include 'base_contacts.html' %}</div>
 {% endblock %}

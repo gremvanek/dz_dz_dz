@@ -1,12 +1,14 @@
+# views.py
 import random
 import string
 
-from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView
 from django.views.generic import TemplateView, DetailView, CreateView, UpdateView, DeleteView
 
-from .forms import ProductForm
+from .forms import ProductForm, VersionForm
 from .models import Product, Post, Version
 
 
@@ -22,8 +24,8 @@ class ContactView(TemplateView):
         )
         return render(request, self.template_name)
 
-    # def get(self, request, *args, **kwargs):
-    #     return render(request, self.template_name)
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
 
 
 class PostView(TemplateView):
@@ -55,7 +57,7 @@ class PostListView(ListView):
 
 class PostDetailView(DetailView):
     model = Post
-    template_name = 'post_detail.html'
+    template_name = 'post_details.html'
     context_object_name = 'post'
 
     def get_object(self, queryset=None):
@@ -115,14 +117,19 @@ class PostDeleteView(DeleteView):
     success_url = reverse_lazy('post_list')
 
 
-class ProductListView(ListView):
+class ProductListView(LoginRequiredMixin, ListView):
     model = Product
     template_name = 'product_list.html'
-    context_object_name = 'products'
+    context_object_name = 'object_list'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(owner=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['product_id'] = self.kwargs.get('pk')
+        for product in context['object_list']:
+            active_version = product.version_set.filter(is_current=True).first()
+            product.active_version = active_version
         return context
 
 
@@ -139,25 +146,31 @@ class ProductDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['product_id'] = self.kwargs.get('pk')
+        product = self.object
+        active_version = product.version_set.filter(is_current=True).first()
+        context['active_version'] = active_version
         return context
 
 
-class ProductCreateView(CreateView):
+class ProductCreateView(LoginRequiredMixin, CreateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'product_form.html'
+    success_url = reverse_lazy('product_list')
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+
+class ProductUpdateView(LoginRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
     template_name = 'product_form.html'
     success_url = reverse_lazy('product_list')
 
 
-class ProductUpdateView(UpdateView):
-    model = Product
-    form_class = ProductForm
-    template_name = 'product_form.html'
-    success_url = reverse_lazy('product_list')
-
-
-class ProductDeleteView(DeleteView):
+class ProductDeleteView(LoginRequiredMixin, DeleteView):
     model = Product
     template_name = 'product_confirm_delete.html'
     success_url = reverse_lazy('product_list')
@@ -170,25 +183,23 @@ class VersionListView(ListView):
     model = Version
     template_name = 'version_list.html'
     context_object_name = 'versions'
-    success_url = reverse_lazy('post_list')
 
-    def form_valid(self, form):
-        instance = form.save(commit=False)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-        # Вызываем метод родительского класса, чтобы сохранить данные формы и получить объект instance
-        response = super().form_valid(form)
+        # Получение первого объекта Product
+        product = Product.objects.first()
 
-        # Генерируем случайный slug
-        random_slug = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
-        counter = 1
-        new_slug = random_slug
-        while Post.objects.filter(slug=new_slug).exists():
-            new_slug = f"{random_slug}-{counter}"
-            counter += 1
+        # Если product не равен None, получаем идентификатор продукта (product_id)
+        if product:
+            product_id = product.pk
+        else:
+            product_id = None
 
-        # Сохраняем slug в экземпляре объекта Post
-        instance.slug = new_slug
-        instance.save()
+        # Добавление идентификатора продукта в контекст
+        context['product_id'] = product_id
+
+        return context
 
 
 class VersionDetailView(DetailView):
@@ -196,42 +207,37 @@ class VersionDetailView(DetailView):
     template_name = 'version_detail.html'
     context_object_name = 'versions'
 
-
-class VersionCreateView(CreateView):
-    model = Version
-    fields = ['version_number', 'version_name', 'product']
-    template_name = 'version_form.html'
-    context_object_name = 'version_create'
-    success_url = reverse_lazy('versions')
-
-    def dispatch(self, request, *args, **kwargs):
-        # Ensure the associated product exists
-        self.product = get_object_or_404(Product, pk=self.kwargs.get('pk'))
-        return super().dispatch(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['product_pk'] = self.product.pk  # Pass the product's pk to the template
+        context['product_id'] = kwargs['product_id']
         return context
 
-    def form_valid(self, form):
-        version = form.save(commit=False)
-        version.product = self.product
-        version.save()
-        return super().form_valid(form)
 
-class VersionUpdateView(UpdateView):
+class VersionCreateView(CreateView):
     model = Version
     fields = ['product', 'version_number', 'version_name', 'is_current']
     template_name = 'version_form.html'
 
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['product'] = self.kwargs['product_id']
+        return initial
+
+
+class VersionUpdateView(UpdateView):
+    model = Version
+    form_class = VersionForm
+    fields = ['product', 'version_number', 'version_name', 'is_current']
+    template_name = 'version_form.html'
+
     def get_success_url(self):
-        return reverse_lazy('versions_list')
+        return reverse_lazy('versions')
 
 
 class VersionDeleteView(DeleteView):
     model = Version
-    success_url = reverse_lazy('versions_list')
+    template_name = 'version_confirm_delete.html'
+    success_url = reverse_lazy('version_list')
 
     def get_success_url(self):
-        return reverse_lazy('versions_list')
+        return self.success_url

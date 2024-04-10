@@ -1,6 +1,9 @@
+# models.py
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
+
+from users.models import User
 
 NULLABLE = {'blank': True, 'null': True}
 
@@ -27,6 +30,7 @@ class Product(models.Model):
     created_at = models.DateTimeField(default=timezone.now, verbose_name='Дата создания', null=True)
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата последнего изменения', null=True)
     views = models.IntegerField(default=0, verbose_name='Количество просмотров')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='products')
 
     def __str__(self):
         return f'{self.name} ({self.category})'
